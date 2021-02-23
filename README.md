@@ -1,4 +1,4 @@
-## Valheim Quality of Life Mods
+## Valheim Quality of Life Mod
 
 A simple quality of life mod for valheim
 
