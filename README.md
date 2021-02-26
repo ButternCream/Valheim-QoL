@@ -9,3 +9,5 @@ Current Features
 - No stamina usage for Hoe, Hammer or Cultivator
 - Can interact when using tools (open doors, chests, etc)
 - Multiplayer mapsync
+
+To install just put the dll in `<steamapps>\Valheim\InSlimVML\Mods`
