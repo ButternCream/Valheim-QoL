@@ -41,6 +41,9 @@
     <Reference Include="assembly_valheim">
       <HintPath>F:\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\assembly_valheim.dll</HintPath>
     </Reference>
+    <Reference Include="SlimAssist">
+      <HintPath>F:\SteamLibrary\steamapps\common\Valheim\InSlimVML\Mods\SlimAssist.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -144,6 +147,9 @@
     </Reference>
     <Reference Include="UnityEngine.XRModule">
       <HintPath>F:\SteamLibrary\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Vale-UI-Library">
+      <HintPath>F:\SteamLibrary\steamapps\common\Valheim\InSlimVML\Mods\Vale-UI-Library.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

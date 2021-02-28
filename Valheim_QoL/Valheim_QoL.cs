@@ -36,13 +36,12 @@ namespace Valheim_QoL
 
     public class Valheim_QoL
     {
-
         public static void Main(string[] args)
         {
             new Thread(delegate ()
             {
                 var harmony = new Harmony("com.valheim.qol");
-                //Harmony.DEBUG = true;
+                Harmony.DEBUG = true;
                 FileLog.Reset();
 
                 bool flag;
@@ -80,7 +79,7 @@ namespace Valheim_QoL
                     break;
                 }
             }
-            
+
             if (index > -1)
             {
                 // remove the 3 instructions so we dont call the function in the if statement
@@ -135,7 +134,7 @@ namespace Valheim_QoL
         }
 
     }
-    
+
     //Draw sphere around 
     //TODO
     [HarmonyPatch(typeof(Plant), "Awake")]
@@ -158,14 +157,43 @@ namespace Valheim_QoL
         public static bool Prefix(global::Console __instance)
         {
             string text = global::Console.instance.m_input.text;
+            Assembly val = typeof(Player).Assembly;
             string[] array = text.Split(new char[]
             {
                 ' '
             });
-            if (text.Equals("syncmap"))
+            if (text.Equals("qol.debug"))
             {
-                InputText_Patch.PrintOut("\n _SYNC MAP IS ACTIVE_ \n");
+                InputText_Patch.PrintOut("Usage: qol.debug <class>");
             }
+            else if (text.Contains("qol.debug"))
+            {
+                try
+                {
+                    string _class = text.Split(' ')[1];
+                    ModUtils.Log(_class);
+                    Type type = val.GetType(_class);
+                    if (type != null)
+                    {
+                        BindingFlags bindingFlags = BindingFlags.Public |
+                                    BindingFlags.NonPublic |
+                                    BindingFlags.Instance |
+                                    BindingFlags.Static;
+                        InputText_Patch.PrintOut($"\n======== {type} =========");
+
+                        foreach (FieldInfo field in type.GetFields(bindingFlags))
+                        {
+                            InputText_Patch.PrintOut($"{field.Name}");
+                        }
+                    }
+                    else
+                    {
+                        InputText_Patch.PrintOut($"{text.Split(' ')[1]} class not found");
+                    }
+                }
+                catch (Exception e) { ModUtils.Log(e); }
+            }
+
             return true;
         }
 
@@ -178,6 +206,19 @@ namespace Valheim_QoL
                 return;
             }
             instance.Print(log);
+        }
+    }
+
+    [HarmonyPatch(typeof(Chat), "AddInworldText")]
+    public static class HideChatPopup_Patch
+    {
+        public static bool Prefix(GameObject go, long senderID, Vector3 position, Talker.Type type, string user, string text)
+        {
+            if (text.StartsWith("START_") && text.EndsWith("#END"))
+            {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -251,10 +292,10 @@ namespace Valheim_QoL
     [HarmonyPatch(typeof(Minimap), "Update")]
     public static class SyncButtonAddListener
     {
-        static float cooldownTimerBase = 10f;
-        static float cooldownTimer = 10f;
-        static float cooldownTimerResolutionBase = 2f;
-        static float cooldownTimerResolution = 2f;
+        static float cooldownTimerBase = 300f;
+        static float cooldownTimer = 300f;
+        static float cooldownTimerResolutionBase = 300f;
+        static float cooldownTimerResolution = 300f;
 
         public static bool Prefix(ref bool[] ___m_explored, ref Texture2D ___m_fogTexture, ref List<ZNet.PlayerInfo> ___m_tempPlayerInfo)
         {
@@ -263,7 +304,6 @@ namespace Valheim_QoL
                 ChatDataReceiver.DataReadyForMerge = false;
                 int explored = ___m_explored.Where(x => x).Count();
                 int friendExplord = ChatDataReceiver.ExplorationData.Where(x => x).Count();
-                //  InputText_Patch.PrintOut("Explorated by me : " + explored + ", explored by friend: " + friendExplord);
                 if (___m_explored.Length != ChatDataReceiver.ExplorationData.Length)
                 {
                     InputText_Patch.PrintOut("Map data resolution error.");
@@ -303,7 +343,7 @@ namespace Valheim_QoL
                 ChatDataReceiver.Clear();
             }
 
-            if (cooldownTimer <= 0 && Input.GetKeyDown(KeyCode.F10))    ////1000
+            if (cooldownTimer <= 0)    ////1000
             {
                 cooldownTimer = cooldownTimerBase;
                 Chat c = Chat.instance;
@@ -359,7 +399,7 @@ namespace Valheim_QoL
                 }
             }
 
-            if (cooldownTimerResolution <= 0 && Input.GetKeyDown(KeyCode.F11))    ////1000
+            if (cooldownTimerResolution <= 0)    ////1000
             {
                 cooldownTimerResolution = cooldownTimerResolutionBase;
                 InputText_Patch.PrintOut("Resolution:" + ___m_explored.Length);
@@ -369,6 +409,5 @@ namespace Valheim_QoL
             cooldownTimerResolution -= Time.deltaTime;
             return true;
         }
-
     }
 }
